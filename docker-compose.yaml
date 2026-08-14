@@ -1,0 +1,107 @@
+services:
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    environment:
+      - LOG_LEVEL=debug
+      - TZ=Asia/Manila
+      - PORT=5055 #optional
+    ports:
+      - 5055:5055
+    volumes:
+      - /docker/appdata/seerr:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+  # ---------------------------------------------------------------------------
+  # Media Server
+  # ---------------------------------------------------------------------------
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Manila
+    volumes:
+      - /docker/appdata/jellyfin:/config
+      - /mnt/media:/data:ro   # Read-only access to organized media
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Download Client
+  # ---------------------------------------------------------------------------
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Manila
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - /docker/appdata/qbittorrent:/config
+      - /mnt/media:/data # Torrent download location
+    ports:
+      - 8080:8080   # Web UI
+      - 6881:6881   # Torrent traffic (TCP)
+      - 6881:6881/udp # Torrent traffic (UDP)
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Indexer Manager
+  # ---------------------------------------------------------------------------
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Manila
+    volumes:
+      - /docker/appdata/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # TV Show Manager
+  # ---------------------------------------------------------------------------
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Manila
+    volumes:
+      - /docker/appdata/sonarr:/config
+      - /mnt/media:/data                   # Needs root /data to hardlink torrents -> media
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Movie Manager
+  # ---------------------------------------------------------------------------
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Manila
+    volumes:
+      - /docker/appdata/radarr:/config
+      - /mnt/media:/data                   # Needs root /data to hardlink torrents -> media
+    ports:
+      - 7878:7878
+    restart: unless-stopped
