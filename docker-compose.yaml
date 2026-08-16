@@ -1,4 +1,22 @@
 services:
+  flaresolverr:
+    # DockerHub mirror flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_FILE=${LOG_FILE:-none}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=Asia/Manila
+    ports:
+      - "${PORT:-8191}:8191"
+    volumes:
+      - /docker/appdata/flaresolver:/config
+    restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
@@ -71,6 +89,9 @@ services:
     ports:
       - 9696:9696
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
 
   # ---------------------------------------------------------------------------
   # TV Show Manager
