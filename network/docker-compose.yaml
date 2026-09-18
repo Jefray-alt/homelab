@@ -1,16 +1,32 @@
-version: "3"
-
 services:
-  pihole:
-    container_name: pihole
-    image: pihole/pihole:latest
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "80:80/tcp"
-    environment:
-      TZ: 'Asia/Manila'
-    volumes:
-      - '/docker/appdata/pi-hole/etc-pihole:/etc/pihole'
-      - '/docker/appdata/pi-hole/etc-dnsmasq.d:/etc/dnsmasq.d'
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: caddy
     restart: unless-stopped
+
+    ports:
+      - "100.68.125.75:80:80"
+      - "100.68.125.75:443:443"
+      - "100.68.125.75:443:443/udp"
+    environment:
+      PORKBUN_API_KEY: ${PORKBUN_API_KEY}
+      PORKBUN_API_SECRET_KEY: ${PORKBUN_API_SECRET_KEY}
+
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+
+volumes:
+  caddy_data:
+  caddy_config:

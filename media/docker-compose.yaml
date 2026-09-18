@@ -17,6 +17,8 @@ services:
     dns:
       - 1.1.1.1
       - 8.8.8.8
+    networks:
+      - proxy
   seerr:
     image: ghcr.io/seerr-team/seerr:latest
     init: true
@@ -24,9 +26,6 @@ services:
     environment:
       - LOG_LEVEL=debug
       - TZ=Asia/Manila
-      - PORT=5055 #optional
-    ports:
-      - 5055:5055
     volumes:
       - /docker/appdata/seerr:/app/config
     healthcheck:
@@ -36,6 +35,8 @@ services:
       interval: 15s
       retries: 3
     restart: unless-stopped
+    networks:
+      - proxy
   # ---------------------------------------------------------------------------
   # Media Server
   # ---------------------------------------------------------------------------
@@ -49,9 +50,9 @@ services:
     volumes:
       - /docker/appdata/jellyfin:/config
       - /mnt/media:/data:ro   # Read-only access to organized media
-    ports:
-      - 8096:8096
     restart: unless-stopped
+    networks:
+      - proxy
 
   # ---------------------------------------------------------------------------
   # Download Client
@@ -73,6 +74,8 @@ services:
       - 6881:6881   # Torrent traffic (TCP)
       - 6881:6881/udp # Torrent traffic (UDP)
     restart: unless-stopped
+    networks:
+      - proxy
 
   # ---------------------------------------------------------------------------
   # Indexer Manager
@@ -86,12 +89,12 @@ services:
       - TZ=Asia/Manila
     volumes:
       - /docker/appdata/prowlarr:/config
-    ports:
-      - 9696:9696
     restart: unless-stopped
     dns:
       - 1.1.1.1
       - 8.8.8.8
+    networks:
+      - proxy
 
   # ---------------------------------------------------------------------------
   # TV Show Manager
@@ -106,9 +109,9 @@ services:
     volumes:
       - /docker/appdata/sonarr:/config
       - /mnt/media:/data                   # Needs root /data to hardlink torrents -> media
-    ports:
-      - 8989:8989
     restart: unless-stopped
+    networks:
+      - proxy
 
   # ---------------------------------------------------------------------------
   # Movie Manager
@@ -123,6 +126,10 @@ services:
     volumes:
       - /docker/appdata/radarr:/config
       - /mnt/media:/data                   # Needs root /data to hardlink torrents -> media
-    ports:
-      - 7878:7878
     restart: unless-stopped
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

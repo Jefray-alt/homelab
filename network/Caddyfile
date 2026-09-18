@@ -1,0 +1,26 @@
+{
+    acme_dns porkbun {
+        api_key {env.PORKBUN_API_KEY}
+        api_secret_key {env.PORKBUN_API_SECRET_KEY}
+    }
+}
+
+jellyfin.chico.lat {
+    reverse_proxy jellyfin:8096
+}
+
+seerr.chico.lat {
+    reverse_proxy seerr:5055
+}
+
+sonarr.chico.lat {
+    reverse_proxy sonarr:8989
+}
+
+radarr.chico.lat {
+    reverse_proxy radarr:7878
+}
+
+qbittorrent.chico.lat {
+    reverse_proxy qbittorrent:7878
+}
