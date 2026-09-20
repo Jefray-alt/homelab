@@ -22,5 +22,5 @@ radarr.chico.lat {
 }
 
 qbittorrent.chico.lat {
-    reverse_proxy qbittorrent:7878
+    reverse_proxy qbittorrent:8080
 }

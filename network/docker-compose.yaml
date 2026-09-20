@@ -8,9 +8,9 @@ services:
     restart: unless-stopped
 
     ports:
-      - "100.68.125.75:80:80"
-      - "100.68.125.75:443:443"
-      - "100.68.125.75:443:443/udp"
+      - "${TAILSCALE_IP}:80:80"
+      - "${TAILSCALE_IP}:443:443"
+      - "${TAILSCALE_IP}:443:443/udp"
     environment:
       PORKBUN_API_KEY: ${PORKBUN_API_KEY}
       PORKBUN_API_SECRET_KEY: ${PORKBUN_API_SECRET_KEY}
